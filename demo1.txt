@@ -1,0 +1,208 @@
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+// Lane positions
+const lanes = [66, 200, 334];
+let currentLane = 1;
+
+// Player car
+const car = { width: 60, height: 110, y: 470 };
+
+// Game state
+let enemies = [];
+let enemySpeed = 4;
+let gameOver = false;
+let score = 0;
+
+// Load images (CORRECTED SYNTAX)
+const playerImg = new Image();
+playerImg.src = "Audi.png";
+
+const enemyImages = [];
+const img1 = new Image(); img1.src = "Ambulance.png"; enemyImages.push(img1);
+const img2 = new Image(); img2.src = "Car1.png"; enemyImages.push(img2);
+const img3 = new Image(); img3.src = "Police.png"; enemyImages.push(img3);
+
+// Draw Road
+function drawRoad() {
+    ctx.fillStyle = "#111";   // Black road
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Side white lines
+    ctx.strokeStyle = "#fff";
+    ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.moveTo(133, 0); ctx.lineTo(133, 600); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(266, 0); ctx.lineTo(266, 600); ctx.stroke();
+
+    // Center dashed yellow line (animated)
+    ctx.strokeStyle = "#ffff00";
+    ctx.lineWidth = 6;
+    const dashOffset = -(Date.now() * 0.02) % 40;
+    for(let y = dashOffset - 40; y < 640; y += 40) {
+        ctx.strokeRect(198, y, 6, 25);
+    }
+}
+// Draw Player Car
+function drawCar() {
+    const x = lanes[currentLane] - car.width / 2;
+    if (playerImg.complete && playerImg.naturalHeight > 0) {
+        ctx.drawImage(playerImg, x, car.y, car.width, car.height);
+    } else {
+        // Fallback blue car
+        ctx.fillStyle = "#4a90e2";
+        ctx.fillRect(x, car.y, car.width, car.height);
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(x+5, car.y+15, 12, 25);
+        ctx.fillRect(x+43, car.y+15, 12, 25);
+    }
+}
+
+// Draw Enemies
+function drawEnemies() {
+    enemies.forEach(enemy => {
+        const x = lanes[enemy.lane] - enemy.width / 2;
+        const img = enemyImages[Math.floor(Math.random() * 3)];
+        
+        if (img.complete && img.naturalHeight > 0) {
+            ctx.drawImage(img, x, enemy.y, enemy.width, enemy.height);
+        } else {
+            // Fallback red car
+            ctx.fillStyle = "#e74c3c";
+            ctx.fillRect(x, enemy.y, enemy.width, enemy.height);
+            ctx.fillStyle = "#fff";
+            ctx.fillRect(x+5, enemy.y+15, 12, 25);
+            ctx.fillRect(x+43, enemy.y+15, 12, 25);
+        }
+    });
+}
+
+// Draw UI
+function drawUI() {
+    ctx.fillStyle = "white";
+    ctx.font = "bold 28px Arial";
+    ctx.shadowColor = "black";
+    ctx.shadowBlur = 5;
+    ctx.fillText("Score: " + score, 12, 35);
+    ctx.shadowBlur = 0;
+    
+    ctx.font = "bold 16px Arial";
+    ctx.fillStyle = "#00ff88";
+    ctx.fillText("← → or WASD", 10, 60);
+}
+
+// Spawn wave (2 enemies, 1 safe lane)
+function spawnEnemies() {
+    const safeLane = Math.floor(Math.random() * 3);
+    for (let i = 0; i < 3; i++) {
+        if (i !== safeLane) {
+            enemies.push({
+                width: 60, height: 110, lane: i, 
+                y: -200 - Math.random() * 100
+            });
+        }
+    }
+}
+
+// Collision detection
+function checkCollision() {
+    const px = lanes[currentLane] - car.width / 2;
+    enemies.forEach(enemy => {
+        const ex = lanes[enemy.lane] - enemy.width / 2;
+        if (Math.abs(px - ex) < 45 && 
+            car.y < enemy.y + 120 && 
+            car.y + 80 > enemy.y) {
+            gameOver = true;
+        }
+    });
+}
+
+// Controls
+document.addEventListener("keydown", e => {
+    e.preventDefault();
+    switch(e.key.toLowerCase()) {
+        case "arrowleft":
+        case "a": if (currentLane > 0) currentLane--; break;
+        case "arrowright": 
+        case "d": if (currentLane < 2) currentLane++; break;
+    }
+});
+
+// Game Loop
+function gameLoop() {
+    if (gameOver) {
+        ctx.fillStyle = "rgba(0,0,0,0.95)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.fillStyle = "#ff4757";
+        ctx.font = "bold 48px Arial";
+        ctx.textAlign = "center";
+        ctx.shadowColor = "#000";
+        ctx.shadowBlur = 15;
+        ctx.fillText("CRASH!", canvas.width/2, 290);
+        
+        ctx.fillStyle = "#fff";
+        ctx.font = "bold 32px Arial";
+        ctx.fillText("Score: " + score, canvas.width/2, 350);
+        ctx.font = "24px Arial";
+        ctx.fillText("F5 to Restart", canvas.width/2, 400);
+        ctx.shadowBlur = 0;
+        ctx.textAlign = "left";
+        return;
+    }
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    drawRoad();
+    drawEnemies();
+    drawCar();
+    drawUI();
+
+    // Update enemies (backwards loop = safe removal)
+    for (let i = enemies.length - 1; i >= 0; i--) {
+        enemies[i].y += enemySpeed;
+        if (enemies[i].y > 650) {
+            enemies.splice(i, 1);
+            score += 10;
+            if (enemySpeed < 14) enemySpeed += 0.015;
+            if (enemies.length < 2) spawnEnemies();
+        }
+    }
+
+    checkCollision();
+    requestAnimationFrame(gameLoop);
+}
+
+// START GAME IMMEDIATELY
+spawnEnemies();
+gameLoop();
+
+console.log("🚗 Game Loaded! Green road + yellow dashes = working!");
+
+
+
+
+
+
+
+
+
+
+
+
+
+function checkCollision() {
+    const playerX = lanes[currentLane] - car.width / 2;
+
+    enemies.forEach(enemy => {
+        const enemyX = lanes[enemy.lane] - enemy.width / 2;
+
+        if (
+            playerX < enemyX + enemy.width &&
+            playerX + car.width > enemyX &&
+            car.y < enemy.y + enemy.height &&
+            car.y + car.height > enemy.y
+        ) {
+            gameOver = true;
+        }
+    });
+}
