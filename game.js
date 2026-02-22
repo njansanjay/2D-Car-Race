@@ -23,7 +23,7 @@ let enemySpeed = 4;
 let gameState = "menu"; 
 // "menu" | "playing" | "gameover"
 let score = 0;
-
+let highScore = Number(localStorage.getItem("highScore")) || 0;
 // Load Images
 const playerImg = new Image();
 playerImg.src = "Audi.png";
@@ -82,38 +82,23 @@ function drawEnemies() {
 }
 
 // Draw Score
+
 function drawScore() {
     ctx.fillStyle = "white";
     ctx.font = "20px Arial";
     ctx.fillText("Score: " + score, 10, 30);
+    ctx.fillText("High Score: " + highScore, 10, 55);
 }
 
 // Spawn first wave
-function spawnEnemies() {
-    enemies = [];
-
-    const safeLane = Math.floor(Math.random() * 3);
-
-    for (let i = 0; i < 3; i++) {
-        if (i !== safeLane) {
-            enemies.push({
-                width: 100,
-                height: 110,
-                lane: i,
-                y: -150 - Math.random() * 200,
-                img: enemyImages[Math.floor(Math.random() * enemyImages.length)]
-            });
-        }
-    }
-}
+//dlted
 
 // Collision
 
 function checkCollision() {
 
-    // Reduce hitbox margins
-    const hitboxPaddingX = 25;   // left/right shrink
-    const hitboxPaddingY = 15;   // top/bottom shrink
+    const hitboxPaddingX = 25;
+    const hitboxPaddingY = 15;
 
     const playerX = lanes[currentLane] - car.width / 2 + hitboxPaddingX;
     const playerWidth = car.width - hitboxPaddingX * 2;
@@ -121,7 +106,7 @@ function checkCollision() {
     const playerY = car.y + hitboxPaddingY;
     const playerHeight = car.height - hitboxPaddingY * 2;
 
-    enemies.forEach(enemy => {
+    for (let enemy of enemies) {
 
         const enemyX = lanes[enemy.lane] - enemy.width / 2 + hitboxPaddingX;
         const enemyWidth = enemy.width - hitboxPaddingX * 2;
@@ -135,27 +120,41 @@ function checkCollision() {
             playerY < enemyY + enemyHeight &&
             playerY + playerHeight > enemyY
         ) {
-            gameState = "gameover";
+            if (score>highScore) {
+                highScore = score;
+                localStorage.setItem("highScore", highScore);
+            }
+        gameState="gameover";
         }
-    });
+    }
 }
 
 
-function spawnEnemies() {
-    enemies = [];
+function spawnEnemy() {
 
-    let lanesArray = [0,1,2];
-    lanesArray.sort(() => Math.random() - 0.5); // shuffle
+    // Find currently occupied lanes near top area
+    let blockedLanes = [];
 
-    // leave last lane safe
-    lanesArray.slice(0,2).forEach(lane => {
-        enemies.push({
-            width: 100,
-            height: 110,
-            lane: lane,
-            y: -150 - Math.random() * 200,
-            img: enemyImages[Math.floor(Math.random() * enemyImages.length)]
-        });
+    enemies.forEach(enemy => {
+        if (enemy.y < 200) {   // only check enemies near spawn area
+            blockedLanes.push(enemy.lane);
+        }
+    });
+
+    // If already 2 lanes blocked, don't block the 3rd
+    if (blockedLanes.length >= 2) return;
+
+    let lane = Math.floor(Math.random() * 3);
+
+    // If lane already blocked near top, skip
+    if (blockedLanes.includes(lane)) return;
+
+    enemies.push({
+        width: 100,
+        height: 110,
+        lane: lane,
+        y: -150,
+        img: enemyImages[Math.floor(Math.random() * enemyImages.length)]
     });
 }
 
@@ -164,13 +163,19 @@ function resetGame() {
     enemySpeed = 4;
     score = 0;
     currentLane = 1;
-    spawnEnemies();
+    spawnEnemy();
     gameState = "playing";
 }
 
 // Keyboard
 
 document.addEventListener("keydown", function (e) {
+
+    //Reset High Scoreee
+    if (e.key.toLowerCase() === "h") {
+        highScore=0;
+        localStorage.removeItem("highScore");
+    }
 
     if (gameState === "menu" && e.key === "Enter") {
         resetGame();
@@ -215,47 +220,53 @@ function gameLoop() {
     // PLAYING
     if (gameState === "playing") {
 
+        // Random spawn
+    if (Math.random() < 0.02) {
+    spawnEnemy();
+}
+
         drawCar();
         drawEnemies();
         drawScore();
 
-        enemies.forEach(enemy => {
-            enemy.y += enemySpeed;
+        for (let i = enemies.length - 1; i >= 0; i--) {
 
-            if (enemy.y > canvas.height) {
-                enemy.y = -150 - Math.random() * 200;
-                enemy.img = enemyImages[Math.floor(Math.random() * enemyImages.length)];
-                score += 5;
+    enemies[i].y += enemySpeed;
 
-                if (enemySpeed < 12) {
-                    enemySpeed += 0.1;
-                }
-            }
-        });
+    if (enemies[i].y > canvas.height) {
+
+        enemies.splice(i, 1);
+        score += 5;
+
+        if (enemySpeed < 12) {
+            enemySpeed += 0.1;
+        }
+    }
+}
 
         checkCollision();
     }
 
     // GAME OVER SCREEN
     if (gameState === "gameover") {
-        drawCar();
-        drawEnemies();
+        //drawCar();
+        //drawEnemies();
 
         ctx.fillStyle = "white";
         ctx.font = "40px Arial";
         ctx.textAlign = "center";
-        ctx.fillText("GAME OVER", canvas.width / 2, 250);
+        ctx.fillText("GAME OVER", canvas.width / 2, 220);
 
         ctx.font = "22px Arial";
-        ctx.fillText("Final Score: " + score, canvas.width / 2, 300);
+        ctx.fillText("Final Score: " + score, canvas.width / 2, 270);
+        ctx.fillText("High Score: " + highScore, canvas.width / 2, 305);
 
-        ctx.fillText("Press R to Retry", canvas.width / 2, 340);
+        ctx.fillText("Press R to Retry", canvas.width / 2, 360);
+        ctx.fillText("Press H to Reset High Score", canvas.width / 2, 395);
         ctx.textAlign = "left";
     }
 
     requestAnimationFrame(gameLoop);
 }
 // Start game
-
 gameLoop();
-
