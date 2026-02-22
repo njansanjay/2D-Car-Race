@@ -112,8 +112,8 @@ function spawnEnemies() {
 function checkCollision() {
 
     // Reduce hitbox margins
-    const hitboxPaddingX = 25;   // left/right shrink
-    const hitboxPaddingY = 15;   // top/bottom shrink
+    const hitboxPaddingX = 20;   // left/right shrink
+    const hitboxPaddingY = 110;   // top/bottom shrink
 
     const playerX = lanes[currentLane] - car.width / 2 + hitboxPaddingX;
     const playerWidth = car.width - hitboxPaddingX * 2;
@@ -256,4 +256,5 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 // Start game
+
 gameLoop();
