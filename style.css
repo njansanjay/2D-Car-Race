@@ -1,0 +1,23 @@
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Page Styling */
+body {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(180deg, #1a1a1a, #2b2b2b);
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Canvas Styling */
+canvas {
+    background: #444;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
