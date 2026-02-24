@@ -39,9 +39,15 @@ img3.src = "Police.png";
 enemyImages.push(img1, img2, img3);
 
 // Draw Road
+
 function drawRoad() {
+
+    // Always draw road background
     ctx.fillStyle = "#333";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Draw lane lines ONLY during playing
+    if (gameState !== "playing") return;
 
     ctx.strokeStyle = "white";
     ctx.lineWidth = 4;
@@ -209,9 +215,9 @@ function gameLoop() {
         ctx.fillStyle = "white";
         ctx.font = "40px Arial";
         ctx.textAlign = "center";
-        ctx.fillText("2D CAR RACING", canvas.width / 2, 250);
+        ctx.fillText("2D CAR RACING", canvas.width / 2, 280);
         ctx.font = "20px Arial";
-        ctx.fillText("Press ENTER to Start", canvas.width / 2, 300);
+        ctx.fillText("Press ENTER to Start", canvas.width / 2, 330);
         ctx.textAlign = "left";
         requestAnimationFrame(gameLoop);
         return;
