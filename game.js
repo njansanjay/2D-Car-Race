@@ -203,6 +203,40 @@ document.addEventListener("keydown", function (e) {
     }
 });
 
+// Mobile Touch Controls
+
+let touchStartX = 0;
+
+canvas.addEventListener("touchstart", function (e) {
+    touchStartX = e.touches[0].clientX;
+});
+
+canvas.addEventListener("touchend", function (e) {
+
+    let touchEndX = e.changedTouches[0].clientX;
+    let diffX = touchEndX - touchStartX;
+
+    // Swipe Right
+    if (diffX > 50 && currentLane < 2 && gameState === "playing") {
+        currentLane++;
+    }
+
+    // Swipe Left
+    if (diffX < -50 && currentLane > 0 && gameState === "playing") {
+        currentLane--;
+    }
+
+    // Tap to Start from Menu
+    if (gameState === "menu") {
+        resetGame();
+    }
+
+    // Tap to Retry on Game Over
+    if (gameState === "gameover") {
+        resetGame();
+    }
+});
+
 // Game Loop
 function gameLoop() {
 
