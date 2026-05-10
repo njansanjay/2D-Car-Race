@@ -98,6 +98,16 @@ function drawScore() {
     ctx.fillText("High Score: " + highScore, 10, 55);
 }
 
+function drawPauseButton() {
+
+    if (!isMobile || gameState !== "playing") return;
+
+    ctx.fillStyle = "white";
+    ctx.font = "30px Arial";
+
+    ctx.fillText("II", canvas.width - 40, 35);
+}
+
 // Spawn first wave
 //dlted
 
@@ -231,6 +241,16 @@ canvas.addEventListener("touchend", function (e) {
     let touchEndX = e.changedTouches[0].clientX;
     let diffX = touchEndX - touchStartX;
 
+    // Pause button touch
+if (
+    touchEndX > canvas.width - 60 &&
+    e.changedTouches[0].clientY < 60 &&
+    gameState === "playing"
+) {
+    gameState = "paused";
+    return;
+}
+
     // Swipe Right
     if (diffX > 50 && currentLane < 2 && gameState === "playing") {
         currentLane++;
@@ -292,6 +312,7 @@ function gameLoop() {
         drawCar();
         drawEnemies();
         drawScore();
+        drawPauseButton();
 
         for (let i = enemies.length - 1; i >= 0; i--) {
 
