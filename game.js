@@ -242,9 +242,15 @@ canvas.addEventListener("touchend", function (e) {
     let diffX = touchEndX - touchStartX;
 
     // Pause button touch
+
+const rect = canvas.getBoundingClientRect();
+
+let touchX = e.changedTouches[0].clientX - rect.left;
+let touchY = e.changedTouches[0].clientY - rect.top;
+
 if (
-    touchEndX > canvas.width - 60 &&
-    e.changedTouches[0].clientY < 60 &&
+    touchX > rect.width - 80 &&
+    touchY < 60 &&
     gameState === "playing"
 ) {
     gameState = "paused";
