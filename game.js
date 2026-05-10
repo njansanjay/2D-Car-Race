@@ -24,6 +24,8 @@ let gameState = "menu";
 // "menu" | "playing" | "gameover"
 let score = 0;
 let highScore = Number(localStorage.getItem("highScore")) || 0;
+// Detect Mobile Device
+const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 // Load Images
 const playerImg = new Image();
 playerImg.src = "Audi.png";
@@ -251,7 +253,11 @@ function gameLoop() {
         ctx.textAlign = "center";
         ctx.fillText("2D CAR RACING", canvas.width / 2, 280);
         ctx.font = "20px Arial";
-        ctx.fillText("Press ENTER to Start", canvas.width / 2, 330);
+        if (isMobile) {
+            ctx.fillText("Tap To Start", canvas.width / 2, 300);
+        } else {
+            ctx.fillText("Press ENTER to Start", canvas.width / 2, 300);
+        }
         ctx.textAlign = "left";
         requestAnimationFrame(gameLoop);
         return;
@@ -301,8 +307,14 @@ function gameLoop() {
         ctx.fillText("Final Score: " + score, canvas.width / 2, 270);
         ctx.fillText("High Score: " + highScore, canvas.width / 2, 305);
 
-        ctx.fillText("Press R to Retry", canvas.width / 2, 360);
-        ctx.fillText("Press H to Reset High Score", canvas.width / 2, 395);
+        if (isMobile) {
+            ctx.fillText("Tap To Retry", canvas.width / 2, 360);
+
+        } else {
+            ctx.fillText("Press R to Retry", canvas.width / 2, 360);
+            ctx.fillText("Press H to Reset High Score", canvas.width / 2, 395);
+
+        }
         ctx.textAlign = "left";
     }
 
