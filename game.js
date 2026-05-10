@@ -25,7 +25,7 @@ let gameState = "menu";
 let score = 0;
 let highScore = Number(localStorage.getItem("highScore")) || 0;
 // Detect Mobile Device
-const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+const isMobile = window.innerWidth <= 768;
 // Load Images
 const playerImg = new Image();
 playerImg.src = "Audi.png";
