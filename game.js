@@ -49,7 +49,7 @@ function drawRoad() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // Draw lane lines ONLY during playing
-    if (gameState !== "playing") return;
+    if (gameState !== "playing" && gameState !== "paused") return;
 
     ctx.strokeStyle = "white";
     ctx.lineWidth = 4;
