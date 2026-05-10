@@ -176,13 +176,25 @@ function resetGame() {
 }
 
 // Keyboard
-
 document.addEventListener("keydown", function (e) {
 
     //Reset High Scoreee
     if (e.key.toLowerCase() === "h") {
         highScore=0;
         localStorage.removeItem("highScore");
+    }
+        // Pause / Resume
+    if (e.key.toLowerCase() === "p") {
+
+        if (gameState === "playing") {
+            gameState = "paused";
+        }
+
+        else if (gameState === "paused") {
+            gameState = "playing";
+        }
+
+        return;
     }
 
     if (gameState === "menu" && e.key === "Enter") {
@@ -203,6 +215,7 @@ document.addEventListener("keydown", function (e) {
             currentLane++;
         }
     }
+ 
 });
 
 // Mobile Touch Controls
@@ -237,6 +250,11 @@ canvas.addEventListener("touchend", function (e) {
     if (gameState === "gameover") {
         resetGame();
     }
+
+// Tap To Resume Pause
+if (gameState === "paused") {
+    gameState = "playing";
+}
 });
 
 // Game Loop
@@ -292,6 +310,33 @@ function gameLoop() {
 
         checkCollision();
     }
+
+    // PAUSED SCREEN
+if (gameState === "paused") {
+
+    drawCar();
+    drawEnemies();
+    drawScore();
+
+    ctx.fillStyle = "rgba(0,0,0,0.5)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = "white";
+    ctx.font = "40px Arial";
+    ctx.textAlign = "center";
+
+    ctx.fillText("PAUSED", canvas.width / 2, 250);
+
+    ctx.font = "22px Arial";
+
+    if (isMobile) {
+        ctx.fillText("Tap To Resume", canvas.width / 2, 300);
+    } else {
+        ctx.fillText("Press P to Resume", canvas.width / 2, 300);
+    }
+
+    ctx.textAlign = "left";
+}
 
     // GAME OVER SCREEN
     if (gameState === "gameover") {
