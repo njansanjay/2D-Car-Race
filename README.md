@@ -10,7 +10,7 @@ Dodge incoming traffic, switch lanes, and survive as long as possible while your
 
 ```
 
-https://njansanjay.github.io/2D-Car-Race/⁠�
+https://njansanjay.github.io/2D-Car-Race/
 ```
 
 ## ✨ Features
@@ -111,14 +111,14 @@ https://njansanjay.github.io/2D-Car-Race/
 ## ⚠️ Limitations
 
 * No sound effects
-* No mobile touch controls
-* No pause feature
+* No mobile touch controls(solved)
+* No pause feature(solved)
 ---
 
 ## 🚀 Future Improvements
 
 * 🔊 Add sound effects & music
-* 📱 Mobile controls (touch/swipe)
+* 📱 Mobile controls (touch/swipe)(added)
 * 🎞️ Animations & transitions
 * 🌍 Global leaderboard
 * 🚘 More vehicle types
